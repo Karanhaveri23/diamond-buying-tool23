@@ -1,0 +1,184 @@
+"use client";
+
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const diamondData = [
+  {
+    vendor: "Premium",
+    shape: "Round",
+    sizeGroup: "1.20-1.49 ct",
+    colorGroup: "FG",
+    clarityGroup: "VVS1–VS2",
+    pricePerCt: 3878.67,
+  },
+  {
+    vendor: "Commercial",
+    shape: "Round",
+    sizeGroup: "1.50-1.69 ct",
+    colorGroup: "J",
+    clarityGroup: "VVS1–VS2",
+    pricePerCt: 3072.87,
+  },
+  {
+    vendor: "Premium",
+    shape: "Round",
+    sizeGroup: "1.50-1.69 ct",
+    colorGroup: "J",
+    clarityGroup: "SI1",
+    pricePerCt: 3283.33,
+  },
+  {
+    vendor: "Commercial",
+    shape: "Round",
+    sizeGroup: "1.20-1.49 ct",
+    colorGroup: "DE",
+    clarityGroup: "SI1",
+    pricePerCt: 3405.33,
+  },
+  {
+    vendor: "Premium",
+    shape: "Round",
+    sizeGroup: "1.50-1.69 ct",
+    colorGroup: "HI",
+    clarityGroup: "SI2",
+    pricePerCt: 3294.0,
+  },
+  {
+    vendor: "Premium",
+    shape: "Asscher",
+    sizeGroup: "1.20-1.49 ct",
+    colorGroup: "HI",
+    clarityGroup: "VVS1–VS2",
+    pricePerCt: 2455.5,
+  },
+  {
+    vendor: "Premium",
+    shape: "Cushion",
+    sizeGroup: "1.00-1.19 ct",
+    colorGroup: "HI",
+    clarityGroup: "SI2",
+    pricePerCt: 1848.0,
+  },
+  {
+    vendor: "Commercial",
+    shape: "Cushion",
+    sizeGroup: "1.50-1.69 ct",
+    colorGroup: "HI",
+    clarityGroup: "SI1",
+    pricePerCt: 3050.0,
+  },
+  {
+    vendor: "Premium",
+    shape: "Oval",
+    sizeGroup: "2.00-2.19 ct",
+    colorGroup: "FG",
+    clarityGroup: "VVS1–VS2",
+    pricePerCt: 4825.0,
+  },
+];
+
+const shapeOptions = Array.from(new Set(diamondData.map((d) => d.shape)));
+
+export default function DiamondTool() {
+  const [budget, setBudget] = useState(5000);
+  const [shape, setShape] = useState("Round");
+  const [results, setResults] = useState([]);
+
+  const handleCalculate = () => {
+    const lowerBound = budget * 0.8;
+    const upperBound = budget * 1.1;
+
+    const filtered = diamondData
+      .filter((d) => d.shape === shape)
+      .map((d) => {
+        const totalPrice =
+          d.pricePerCt * parseFloat(d.sizeGroup.split("-")[0]);
+        return {
+          ...d,
+          totalPrice,
+          carats: parseFloat((budget / d.pricePerCt).toFixed(2)),
+        };
+      })
+      .filter(
+        (d) => d.totalPrice >= lowerBound && d.totalPrice <= upperBound
+      );
+
+    setResults(filtered);
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-6 flex-wrap justify-center">
+        <Label htmlFor="budget">Your Budget ($)</Label>
+        <Input
+          id="budget"
+          type="number"
+          value={budget}
+          onChange={(e) => setBudget(parseFloat(e.target.value))}
+          className="w-32"
+        />
+        <Label htmlFor="shape">Shape</Label>
+        <Select onValueChange={(val) => setShape(val)} defaultValue={shape}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Select shape" />
+          </SelectTrigger>
+          <SelectContent>
+            {shapeOptions.map((shapeOption) => (
+              <SelectItem key={shapeOption} value={shapeOption}>
+                {shapeOption}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button onClick={handleCalculate}>Show Options</Button>
+      </div>
+
+      <div className="grid gap-4">
+        {results.map((d, i) => (
+          <Card key={i}>
+            <CardContent className="p-4">
+              <p>
+                <strong>Vendor:</strong> {d.vendor}
+              </p>
+              <p>
+                <strong>Shape:</strong> {d.shape}
+              </p>
+              <p>
+                <strong>Size Group:</strong> {d.sizeGroup}
+              </p>
+              <p>
+                <strong>Color Group:</strong> {d.colorGroup}
+              </p>
+              <p>
+                <strong>Clarity Group:</strong> {d.clarityGroup}
+              </p>
+              <p>
+                <strong>Avg Price/ct:</strong> $
+                {d.pricePerCt.toLocaleString()}
+              </p>
+              <p>
+                <strong>You can buy:</strong> ~{d.carats} ct
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+        {results.length === 0 && (
+          <p className="text-muted-foreground">
+            No options available in this budget.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}

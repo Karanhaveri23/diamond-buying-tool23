@@ -1,6 +1,6 @@
 "use client";
 
-import DiamondTool from "@/components/DiamondTool";
+import DiamondTool from "../components/DiamondTool";
 
 export default function Home() {
   return (
@@ -14,10 +14,8 @@ export default function Home() {
       <p className="text-sm text-gray-500 max-w-md mb-8 text-center">
         Results are smart-filtered to show you only meaningful upgrades in size, color, clarity, and vendor.
       </p>
-      
+
       <DiamondTool />
     </main>
   );
 }
-
-
