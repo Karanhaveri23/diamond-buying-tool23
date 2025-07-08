@@ -107,7 +107,7 @@ export default function DiamondTool() {
         return {
           ...d,
           totalPrice,
-          carats: parseFloat((budget / d.pricePerCt).toFixed(2)),
+          carats: parseFloat(d.sizeGroup.split("-")[0]),
         };
       })
       .filter(
